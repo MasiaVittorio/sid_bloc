@@ -1,0 +1,8 @@
+/.dart_tool
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/.idea
+/.metadata
+/.packages
+/pubspec.lock
+/sid_bloc.iml
