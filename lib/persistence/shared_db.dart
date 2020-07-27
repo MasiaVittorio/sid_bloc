@@ -15,37 +15,45 @@ final String _createTable = '''
 const String _NAME = "shared.db";
 
 
-///A class that can be used just like shared preferences, but it 
-///uses a sqlite database under the hood.
-///You call [final instance = await SharedDb.getInstance()]
-///and the you can go like [instance.getString(key)] or even
-///[instance.setString(key,value)] but just with strings. 
+/// A class that can be used just like shared preferences, but it 
+/// uses a sqlite database under the hood.
+/// You call [final instance = await SharedDb.getInstance()]
+/// and the you can go like [instance.getString(key)] or even
+/// [instance.setString(key,value)] but just with strings. 
 class SharedDb {
   //Singleton pattern
   static SharedDb _instance;
-  SharedDb._(this.db);
+  SharedDb._construct(this.db);
   final sqflite.Database db;
 
   static Future<sqflite.Database> _db;
 
-  static Future<SharedDb> getInstance() async{
+  static int _idSinceCreated = 0;
+
+  static Future<SharedDb> getInstance() async {
+    final int thisId = _idSinceCreated;
 
     //make sure they all await the same future
     if(_db == null && _instance == null){
-      _db = _getDb();
+      _db = _getDb(thisId);
     }
 
     //if the future is there, await for it
     //and then delete it
     if(_db != null){
 
-      final sqflite.Database _d = await _db;
+      final sqflite.Database _createdDatabase = await _db;
       _db = null;
+
+      if(thisId != _idSinceCreated){
+        /// The database has been closed since!
+        return null;
+      }
 
       //with the database obtained (the same for every call of getInstance)
       //create the SharedDb instance but only one time
       if(_instance == null){
-        _instance = SharedDb._(_d);
+        _instance = SharedDb._construct(_createdDatabase);
       }
     }
 
@@ -58,10 +66,15 @@ class SharedDb {
     return path.join(databasesPath, _NAME);
   }
 
-  static Future<sqflite.Database> _getDb() async {
+  static Future<sqflite.Database> _getDb(int thisId) async {
     try {
 
       final String path = await _getPath();
+
+      if(thisId != _idSinceCreated){
+        /// The database has been closed since!
+        return null;
+      }
 
       sqflite.Database result = await sqflite.openDatabase(
         path,
@@ -73,8 +86,20 @@ class SharedDb {
         }
       );
 
+      if(thisId != _idSinceCreated){
+        /// The database has been closed since!
+        result.close();
+        return null;
+      }
+
       //non so perché, copiato da frideos
       await result.execute('PRAGMA case_sensitive_like = true');
+
+      if(thisId != _idSinceCreated){
+        /// The database has been closed since!
+        result.close();
+        return null;
+      }
 
       return result;
 
@@ -83,6 +108,14 @@ class SharedDb {
       print(e);
       return null;
 
+    }
+  }
+
+  static void close(){
+    _idSinceCreated++;
+    if(_instance != null){
+      _instance.db?.close();
+      _instance = null;
     }
   }
 
@@ -141,4 +174,5 @@ class SharedDb {
       return -1;
     }
   }
+
 }
