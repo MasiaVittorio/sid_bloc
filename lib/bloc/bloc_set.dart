@@ -50,7 +50,7 @@ class BlocSet<T> {
 
   /// if you ever modify [value] without using the [set()] method, MAKE SURE you call [refresh()] 
   /// to keep the value of this instance of [BlocVar] in sync with its stream
-  void refresh() => this.variable.refresh();
+  void refresh() => this.variable.set(this.list[this.index]);
 
   Widget build(
     ValueBuilder<T> builder,
