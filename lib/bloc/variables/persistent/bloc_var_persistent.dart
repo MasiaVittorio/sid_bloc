@@ -78,6 +78,12 @@ class PersistentVar<T> extends BlocVar<T>{
     this._write();
   }
 
+  @override
+  void edit(void Function(T) editor){
+    super.edit(editor);
+    this._write();
+  }
+
 
   Future<void> _read() async {
 

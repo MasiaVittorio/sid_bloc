@@ -114,6 +114,11 @@ class BlocVar<T> {
     behavior.add(this.copied);
   } 
 
+  void edit(Function(T) editor){
+    editor(this.value);
+    this.refresh();
+  }
+
   bool setDistinct(T newVal){
     bool _ret = false;
 
