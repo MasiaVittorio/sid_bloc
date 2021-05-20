@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:sid_bloc/persistence/shared_db.dart';
 // import 'package:sid_bloc/persistence_hive/persistence.dart';
 
@@ -12,15 +11,15 @@ import 'dart:convert';
 class PersistentVar<T> extends BlocVar<T>{
 
   PersistentVar({
-    @required this.initVal,
-    @required this.key,   
+    required this.initVal,
+    required this.key,   
     this.fromJson,
     this.toJson, 
-    BlocVar<Map<String,bool>> readCount,
+    BlocVar<Map<String,bool>>? readCount,
     this.readCallback,
-    void Function(T) onChanged,
-    bool Function(T, T) equals,
-    T Function(T) copier,
+    void Function(T)? onChanged,
+    bool Function(T, T)? equals,
+    T Function(T)? copier,
     this.verboseRead = false,
     // this.hiveOverSqflite = false,
   }):super(initVal, onChanged: onChanged, equals: equals, copier: copier){
@@ -49,10 +48,10 @@ class PersistentVar<T> extends BlocVar<T>{
   final String key;
   bool reading = true;
 
-  void Function(T value) readCallback;
+  void Function(T value)? readCallback;
 
-  final T Function(dynamic json) fromJson;
-  final FutureOr<dynamic> Function(T element) toJson;
+  final T Function(dynamic json)? fromJson;
+  final FutureOr<dynamic> Function(T element)? toJson;
 
   final bool verboseRead;
   // final bool hiveOverSqflite;

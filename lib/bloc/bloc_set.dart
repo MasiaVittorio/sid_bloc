@@ -9,15 +9,14 @@ import 'package:sid_utils/sid_utils.dart';
 
 class BlocSet<T> {
   BlocSet(this.list): this.index = 0 {
-    assert(list != null);
     assert(list.length != 0);
     this.variable = BlocVar<T>(this.list[this.index]);
   }
 
   List<T> list;
   int index;
-  BlocVar<T> variable;
-  StreamSubscription _pickSubscription;
+  late BlocVar<T> variable;
+  StreamSubscription? _pickSubscription;
 
   Type get type => T;
 
@@ -47,7 +46,7 @@ class BlocSet<T> {
 
   void dispose() {
     this.variable.dispose();
-    this._pickSubscription?.cancel();
+    _pickSubscription?.cancel();
   }
 
 
@@ -61,7 +60,7 @@ class BlocSet<T> {
     distinct = false,
   }){
     return this.variable.build(
-      builder,
+      builder as Widget Function(BuildContext, T?),
       distinct: distinct,
     );
   }

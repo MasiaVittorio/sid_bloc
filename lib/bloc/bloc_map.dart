@@ -3,24 +3,23 @@ import 'dart:convert';
 import 'package:sid_bloc/persistence/persistence.dart';
 import 'bloc.dart';
 
-import 'package:flutter/material.dart';
 
-class BlocMap<S,T> extends BlocVar<Map<S,T>> {
+class BlocMap<S,T> extends BlocVar<Map<S,T?>> {
 
   //=======================================================
   // Constructor
   BlocMap(Map<S,T> _content, {
-    @required this.key,
+    required this.key,
     this.itemToJson,
     this.jsonToItem,
     this.keyToJson,
     this.jsonToKey,
-    void Function(Map<S,T>) onChanged,
+    void Function(Map<S,T?>)? onChanged,
     this.readCallback, 
   }): super(
     _content,
     onChanged: onChanged,
-    copier: (map) => <S,T>{for(final entry in map.entries) entry.key : entry.value},
+    copier: (map) => <S,T?>{for(final entry in map.entries) entry.key : entry.value},
     equals: (m1, m2){
       for(final k in {...(m1.keys), ...(m2.keys)}){
         if(m1[k] != m2[k]) return false;
@@ -29,7 +28,7 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
     },
   )
   { 
-    if(itemToJson == null) itemToJson = (T a) => a; 
+    if(itemToJson == null) itemToJson = (T? a) => a; 
     if(keyToJson == null) keyToJson = (S a) => a; 
     if(jsonToItem == null) jsonToItem = (dynamic a) => a; 
     if(jsonToKey == null) jsonToKey = (dynamic a) => a; 
@@ -45,13 +44,13 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   // Values
 
   final String key;
-  T Function(dynamic) jsonToItem;
-  dynamic Function(T) itemToJson;
-  S Function(dynamic) jsonToKey;
-  dynamic Function(S) keyToJson;
+  T? Function(dynamic)? jsonToItem;
+  dynamic Function(T?)? itemToJson;
+  S Function(dynamic)? jsonToKey;
+  dynamic Function(S)? keyToJson;
 
   bool reading = true;
-  void Function(Map<S,T>) readCallback;
+  void Function(Map<S,T?>)? readCallback;
 
   //=======================================================
   // Getters
@@ -63,12 +62,12 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   String singleKey(S key) => this.key + "_" + jsonEncode(this.encodedKey(key));
 
   dynamic encodedKey(S key) => this.keyToJson?.call(key) ?? key;
-  dynamic encodedItem(T item) => this.itemToJson?.call(item) ?? item;
+  dynamic encodedItem(T? item) => this.itemToJson?.call(item) ?? item;
 
   //=======================================================
   // Methods
   @override
-  void set(Map<S,T> newVal, {bool withoutWriting = false}){
+  void set(Map<S,T?> newVal, {bool withoutWriting = false}){
     super.set(newVal);
     if(withoutWriting == false){
       this._write();
@@ -76,7 +75,7 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   }
 
   @override
-  bool setDistinct(Map<S,T> newVal, {bool withoutWriting = false}){
+  bool setDistinct(Map<S,T?> newVal, {bool withoutWriting = false}){
     bool result = super.setDistinct(newVal);
     if(withoutWriting == false){
       this._write();
@@ -110,7 +109,7 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   }
 
   @override
-  void refresh({S key}){
+  void refresh({S? key}){
     super.refresh();
     this._write(keyToWrite: key);
   }
@@ -119,12 +118,13 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   // Persistence
   Future<bool> _read() async {
   
-    final _instance = await SharedDb.getInstance();
+    final SharedDb? _instance = await SharedDb.getInstance();
+    if(_instance == null) return false;
 
-    final String _allKeysString = await _instance.getString(this.allKeysKey);
+    final String? _allKeysString = await _instance.getString(this.allKeysKey);
     if(_allKeysString == null) return false; // not wrote anything yet
 
-    List<dynamic> _allEncodedKeysFromDisk; 
+    List<dynamic>? _allEncodedKeysFromDisk; 
     bool _error = false;
     try{
       _allEncodedKeysFromDisk = jsonDecode(_allKeysString);
@@ -133,9 +133,9 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
       print("unexpected error during allkeys decoding of $key: error = $e");
     }
     if(_error) return false;
-    if(_allEncodedKeysFromDisk.isEmpty) return false;
+    if(_allEncodedKeysFromDisk!.isEmpty) return false;
 
-    List<S> _allDecodedKeysFromDisk;
+    List<S>? _allDecodedKeysFromDisk;
     _error = false;
     try {
       _allDecodedKeysFromDisk = <S>[
@@ -150,12 +150,12 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
     if(_allDecodedKeysFromDisk == null) return false;
     if(_allDecodedKeysFromDisk.isEmpty) return false;
 
-    Map<S,T> _contentFromDisk = <S,T>{};
+    Map<S,T?> _contentFromDisk = <S,T?>{};
 
     for(final _decodedKey in _allDecodedKeysFromDisk){
-      final String _itemString = await _instance.getString(this.singleKey(_decodedKey));
+      final String? _itemString = await _instance.getString(this.singleKey(_decodedKey));
       if(_itemString == null) continue;
-      T _item; 
+      T? _item; 
       _error = false;
       try{
         final jsonItem = jsonDecode(_itemString);
@@ -178,9 +178,10 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   }
 
 
-  void _write({S keyToWrite}) async {
+  void _write({S? keyToWrite}) async {
 
-    final instance = await SharedDb.getInstance();
+    final SharedDb? instance = await SharedDb.getInstance();
+    if(instance == null) return;
 
     instance.setString(this.allKeysKey, jsonEncode(this.allEncodedKeys));
 
@@ -195,7 +196,8 @@ class BlocMap<S,T> extends BlocVar<Map<S,T>> {
   }
 
   void _deleteFromDisk(S key) async {
-    final instance = await SharedDb.getInstance();
+    final SharedDb? instance = await SharedDb.getInstance();
+    if(instance == null) return;
 
     instance.deleteByKey(singleKey(key));
   }

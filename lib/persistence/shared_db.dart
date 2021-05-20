@@ -22,15 +22,15 @@ const String _NAME = "shared.db";
 /// [instance.setString(key,value)] but just with strings. 
 class SharedDb {
   //Singleton pattern
-  static SharedDb _instance;
+  static SharedDb? _instance;
   SharedDb._construct(this.db);
-  final sqflite.Database db;
+  final sqflite.Database? db;
 
-  static Future<sqflite.Database> _db;
+  static Future<sqflite.Database?>? _db;
 
   static int _idSinceCreated = 0;
 
-  static Future<SharedDb> getInstance() async {
+  static Future<SharedDb?> getInstance() async {
     final int thisId = _idSinceCreated;
 
     //make sure they all await the same future
@@ -42,7 +42,7 @@ class SharedDb {
     //and then delete it
     if(_db != null){
 
-      final sqflite.Database _createdDatabase = await _db;
+      final sqflite.Database? _createdDatabase = await _db;
       _db = null;
 
       if(thisId != _idSinceCreated){
@@ -66,7 +66,7 @@ class SharedDb {
     return path.join(databasesPath, _NAME);
   }
 
-  static Future<sqflite.Database> _getDb(int thisId) async {
+  static Future<sqflite.Database?> _getDb(int thisId) async {
     try {
 
       final String path = await _getPath();
@@ -114,22 +114,21 @@ class SharedDb {
   static void close(){
     _idSinceCreated++;
     if(_instance != null){
-      _instance.db?.close();
+      _instance!.db?.close();
       _instance = null;
     }
   }
 
-  Future<String> getString(String key) async {
-    assert(key != null);
+  Future<String?> getString(String key) async {
 
-    String valueString;
+    String? valueString;
     final query = 'SELECT * FROM $_TABLE WHERE key = ?';
 
     try {
-      final queryResult = await this.db.rawQuery(query, [key]);
+      final queryResult = await this.db!.rawQuery(query, [key]);
 
       if (queryResult.isNotEmpty) {
-        valueString = queryResult.first['$_COLUMN_VALUE'];
+        valueString = queryResult.first['$_COLUMN_VALUE'] as String?;
       }
     } catch (e) {
       print(e);
@@ -139,16 +138,15 @@ class SharedDb {
   }
 
   Future<bool> setString(String key, String value) async {
-    assert(key != null);
 
     try {
       
-      int changes = await this.db.rawUpdate(
+      int changes = await this.db!.rawUpdate(
         'UPDATE $_TABLE SET value = ? WHERE key = ?',
         [value,key]
       );
       if(changes == 0)
-        await this.db.execute(
+        await this.db!.execute(
           '''
           INSERT INTO $_TABLE (key, $_COLUMN_VALUE) 
           VALUES  (?, ?); 
@@ -165,10 +163,9 @@ class SharedDb {
   }
 
   Future<int> deleteByKey(String key) async {
-    assert(key != null);
 
     try {
-      return await this.db.delete(_TABLE, where: 'key = ?', whereArgs: [key]);
+      return await this.db!.delete(_TABLE, where: 'key = ?', whereArgs: [key]);
     } catch (e) {
       print(e);
       return -1;

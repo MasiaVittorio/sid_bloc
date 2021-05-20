@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:sid_bloc/persistence/shared_db.dart';
 
 import 'bloc.dart';
@@ -17,11 +16,11 @@ import 'dart:convert';
 class PersistentSet<T> extends BlocSet<T> {
 
   PersistentSet({
-    @required this.initList,
-    @required this.key,   
-    @required this.fromJson,
-    @required this.toJson,   
-    BlocVar<Map<String,bool>> readCount,
+    required this.initList,
+    required this.key,   
+    required this.fromJson,
+    required this.toJson,   
+    BlocVar<Map<String,bool>>? readCount,
     // this.hiveOverSqflite = false,
   }) : super(initList) {
     if(
@@ -53,7 +52,7 @@ class PersistentSet<T> extends BlocSet<T> {
     });
   }
 
-  PersistentVar<int> persistentIndex;
+  late PersistentVar<int> persistentIndex;
   List<T> initList;
 
   String key;

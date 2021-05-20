@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import 'package:sid_bloc/persistence/sid_cache.dart';
 
 
@@ -16,17 +14,15 @@ class SidCacheMap<T>{
   final T Function(dynamic json) fromJson;
   final dynamic Function(T element) toJson;
 
-  Map<String,SidCache<T>> _caches;
+  late Map<String,SidCache<T>> _caches;
 
   SidCacheMap({
-    @required this.prefixKey,
-    Map<String,List<T>> initialMap,
+    required this.prefixKey,
+    Map<String,List<T>>? initialMap,
     this.maxCapacity = 20,
-    @required this.fromJson,
-    @required this.toJson,
+    required this.fromJson,
+    required this.toJson,
   }): 
-    assert(maxCapacity != null),
-    assert(prefixKey != null),
     _map = initialMap ?? <String,List<T>>{}
   {
     this._caches = <String, SidCache<T>>{
@@ -43,14 +39,13 @@ class SidCacheMap<T>{
 
   List<T> read(String key) => <T>[
     if(_map[key] != null)
-      ...this._map[key]
+      ...this._map[key]!
   ];
 
   List<T> readAll()
     => <T>[
       for(List<T> l in _map.values)
-        if(l != null)
-          ...l,
+        ...l,
     ];
 
   bool containsKey(String key)

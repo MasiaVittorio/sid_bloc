@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:sid_bloc/persistence/cached_db.dart';
 
 
@@ -19,21 +18,20 @@ class SidCache<T>{
   final dynamic Function(T element) toJson;
 
   SidCache({
-    @required this.key,
-    List<T> initialElements,
+    required this.key,
+    List<T>? initialElements,
     this.maxCapacity = 20,
-    @required this.fromJson,
-    @required this.toJson,
+    required this.fromJson,
+    required this.toJson,
   }): 
-    assert(key != null && key != ""),
-    assert(maxCapacity != null),
+    assert(key != ""),
     elements = initialElements ?? <T>[]
   {
     this._read();
   }
 
   Future _read() async {
-    CachedDb instance = await CachedDb.getInstance();
+    CachedDb instance = await (CachedDb.getInstance() as FutureOr<CachedDb>);
     String jsonString = await instance.getString(this.key) ?? '';
 
     if(jsonString == '')
@@ -59,7 +57,7 @@ class SidCache<T>{
   }
 
   void _write() async {
-    CachedDb instance = await CachedDb.getInstance();
+    CachedDb instance = await (CachedDb.getInstance() as FutureOr<CachedDb>);
 
     String s = jsonEncode(<String>[
       for(T t in this.elements)
@@ -87,7 +85,7 @@ class SidCache<T>{
   }
 
   void dispose() async {
-    CachedDb instance = await CachedDb.getInstance();
+    CachedDb instance = await (CachedDb.getInstance() as FutureOr<CachedDb>);
     instance.deleteByKey(this.key);
   }
 

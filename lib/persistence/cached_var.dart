@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:sid_bloc/persistence/persistence.dart';
-import 'package:flutter/material.dart';
+
 
 class CachedVar<T>{
   final String key;
@@ -10,8 +10,8 @@ class CachedVar<T>{
   final T Function(dynamic) fromJson; 
 
   CachedVar(this.key, this.privateValue, {
-    @required this.toJson,
-    @required this.fromJson,
+    required this.toJson,
+    required this.fromJson,
   }){
     this._read();
   }
@@ -25,13 +25,16 @@ class CachedVar<T>{
 
   void forceWrite() => _write();
   void _write() async {
-    final instance = await CachedDb.getInstance();
+    final CachedDb? instance = await CachedDb.getInstance();
+    if(instance == null) return;
     instance.setString(this.key, jsonEncode(this.toJson(this.privateValue)));
   }
 
   void _read() async {
-    final instance = await CachedDb.getInstance();
-    String string = await instance.getString(this.key);
+    final CachedDb? instance = await CachedDb.getInstance();
+    if(instance == null) return;
+
+    String? string = await instance.getString(this.key);
 
     if(string != null)
       try {

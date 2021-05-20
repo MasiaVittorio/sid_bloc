@@ -24,13 +24,13 @@ const String _NAME = "cached.db";
 ///[instance.setString(key,value)] but just with strings. 
 class CachedDb {
   //Singleton pattern
-  static CachedDb _instance;
+  static CachedDb? _instance;
   CachedDb._(this.db);
-  final sqflite.Database db;
+  final sqflite.Database? db;
 
-  static Future<sqflite.Database> _db;
+  static Future<sqflite.Database?>? _db;
 
-  static Future<CachedDb> getInstance() async{
+  static Future<CachedDb?> getInstance() async{
 
     //make sure they all await the same future
     if(_db == null && _instance == null){
@@ -41,7 +41,7 @@ class CachedDb {
     //and then delete it
     if(_db != null){
 
-      final sqflite.Database _d = await _db;
+      final sqflite.Database? _d = await _db;
       _db = null;
 
       //with the database obtained (the same for every call of getInstance)
@@ -60,7 +60,7 @@ class CachedDb {
     return path.join(dir.path, _NAME);
   }
 
-  static Future<sqflite.Database> _getDb() async {
+  static Future<sqflite.Database?> _getDb() async {
     try {
 
       final String path = await _getPath();
@@ -88,17 +88,15 @@ class CachedDb {
     }
   }
 
-  Future<String> getString(String key) async {
-    assert(key != null);
-
-    String valueString;
+  Future<String?> getString(String key) async {
+    String? valueString;
     final query = 'SELECT * FROM $_TABLE WHERE key = ?';
 
     try {
-      final queryResult = await this.db.rawQuery(query, [key]);
+      final queryResult = await this.db!.rawQuery(query, [key]);
 
       if (queryResult.isNotEmpty) {
-        valueString = queryResult.first['$_COLUMN_VALUE'];
+        valueString = queryResult.first['$_COLUMN_VALUE'] as String?;
       }
     } catch (e) {
       print(e);
@@ -108,16 +106,15 @@ class CachedDb {
   }
 
   Future<bool> setString(String key, String value) async {
-    assert(key != null);
 
     try {
       
-      int changes = await this.db.rawUpdate(
+      int changes = await this.db!.rawUpdate(
         'UPDATE $_TABLE SET value = ? WHERE key = ?',
         [value,key]
       );
       if(changes == 0)
-        await this.db.execute(
+        await this.db!.execute(
           '''
           INSERT INTO $_TABLE (key, $_COLUMN_VALUE) 
           VALUES  (?, ?); 
@@ -134,10 +131,9 @@ class CachedDb {
   }
 
   Future<int> deleteByKey(String key) async {
-    assert(key != null);
 
     try {
-      return await this.db.delete(_TABLE, where: 'key = ?', whereArgs: [key]);
+      return await this.db!.delete(_TABLE, where: 'key = ?', whereArgs: [key]);
     } catch (e) {
       print(e);
       return -1;

@@ -3,24 +3,23 @@ import 'dart:convert';
 import 'package:sid_bloc/persistence/persistence.dart';
 import 'bloc.dart';
 
-import 'package:flutter/material.dart';
 import 'package:sid_utils/sid_utils.dart';
 
-class BlocBox<T> extends BlocVar<List<T>> {
+class BlocBox<T> extends BlocVar<List<T?>> {
 
   //=======================================================
   // Constructor
   BlocBox(List<T> _content, {
-    @required this.key,
-    @required this.itemToJson,
-    @required this.jsonToItem,
-    void Function(List<T>) onChanged,
+    required this.key,
+    required this.itemToJson,
+    required this.jsonToItem,
+    void Function(List<T?>)? onChanged,
     this.readCallback, 
-    bool Function(List<T>, List<T>) equals,
+    bool Function(List<T?>, List<T?>)? equals,
   }): super(
     _content,
     onChanged: onChanged,
-    copier: (list) => <T>[for(final e in list) e],
+    copier: (list) => <T?>[for(final e in list) e],
     equals: equals,
   )
   {
@@ -36,10 +35,10 @@ class BlocBox<T> extends BlocVar<List<T>> {
 
   final String key;
   final T Function(dynamic) jsonToItem;
-  final dynamic Function(T) itemToJson;
+  final dynamic Function(T?) itemToJson;
 
   bool reading = true;
-  void Function(List<T>) readCallback;
+  void Function(List<T?>)? readCallback;
 
   //=======================================================
   // Getters
@@ -50,7 +49,7 @@ class BlocBox<T> extends BlocVar<List<T>> {
   //=======================================================
   // Methods
   @override
-  void set(List<T> newVal, {bool withoutWriting = false}){
+  void set(List<T?> newVal, {bool withoutWriting = false}){
     super.set(newVal);
     if(withoutWriting == false){
       this._write();
@@ -68,7 +67,7 @@ class BlocBox<T> extends BlocVar<List<T>> {
   void setIndex(int index, T newItem, {bool withoutWriting = false}){
     if(!this.value.checkIndex(index)) return;
 
-    super.set(<T>[for(int i = 0; i < this.value.length; ++i)
+    super.set(<T?>[for(int i = 0; i < this.value.length; ++i)
       if(i == index) newItem
       else this.value[i],
     ]);
@@ -95,7 +94,7 @@ class BlocBox<T> extends BlocVar<List<T>> {
   }
 
   @override
-  void refresh({int index}){
+  void refresh({int? index}){
     super.refresh();
     this._write(index: index);
   }
@@ -104,12 +103,13 @@ class BlocBox<T> extends BlocVar<List<T>> {
   // Persistence
   Future<bool> _read() async {
   
-    final SharedDb instance = await SharedDb.getInstance();
+    final SharedDb? instance = await SharedDb.getInstance();
+    if(instance == null) return false;
 
-    final String lenghtString = await instance.getString(this.lenghtKey);
+    final String? lenghtString = await instance.getString(this.lenghtKey);
     if(lenghtString == null) return false; // not wrote anything yet
 
-    int lenghtFromDisk; 
+    int? lenghtFromDisk; 
     bool error = false;
     try{
       lenghtFromDisk = jsonDecode(lenghtString);
@@ -120,12 +120,12 @@ class BlocBox<T> extends BlocVar<List<T>> {
     if(error) return false;
     if(lenghtFromDisk == 0) return false;
 
-    List<T> _content = <T>[];
+    List<T?> _content = <T?>[];
 
-    for(int i = 0; i < lenghtFromDisk; ++i){
-      String itemString = await instance.getString(this.indexKey(i));
+    for(int i = 0; i < lenghtFromDisk!; ++i){
+      String? itemString = await instance.getString(this.indexKey(i));
       if(itemString == null) continue;
-      T item; 
+      T? item; 
       bool error = false;
       try{
         item = this.jsonToItem(jsonDecode(itemString));
@@ -177,9 +177,10 @@ class BlocBox<T> extends BlocVar<List<T>> {
   //   this.set(result);
   // } 
 
-  void _write({int index}) async {
+  void _write({int? index}) async {
 
-    final instance = await SharedDb.getInstance();
+    final SharedDb? instance = await SharedDb.getInstance();
+    if(instance == null) return;
 
     instance.setString(lenghtKey, jsonEncode(this.value.length));
 
@@ -195,7 +196,8 @@ class BlocBox<T> extends BlocVar<List<T>> {
   }
 
   void _delete(int index) async {
-    final instance = await SharedDb.getInstance();
+    final SharedDb? instance = await SharedDb.getInstance();
+    if(instance == null) return;
 
     instance.deleteByKey(indexKey(index));
   }

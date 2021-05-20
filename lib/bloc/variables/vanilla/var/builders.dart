@@ -3,14 +3,14 @@ part of bloc_var;
 extension BlocVarBuilders<T> on BlocVar<T> {
 
   Widget buildDistinct(
-    ValueBuilder<T> builder,
+    ValueBuilder<T?> builder,
   ) => build(builder, distinct: true);
 
   Widget build(
-    ValueBuilder<T> builder,
+    ValueBuilder<T?> builder,
     {bool distinct = false,}
   ) => StreamBuilder<T>(
-    stream: distinct ?? false
+    stream: distinct
       ? this.outDistinct
       : this.out,
     initialData: this.value,
@@ -19,11 +19,11 @@ extension BlocVarBuilders<T> on BlocVar<T> {
   );
 
   Widget buildChild({
-    Widget child,
-    @required ChildValueBuilder builder,
+    Widget? child,
+    required ChildValueBuilder builder,
     bool distinct = false,
   }) => StreamBuilder<T>(
-    stream: distinct ?? false 
+    stream: distinct 
       ? this.outDistinct
       : this.out,
     initialData: this.value,
