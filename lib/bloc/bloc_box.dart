@@ -104,7 +104,7 @@ class BlocBox<T> extends BlocVar<List<T>> {
   // Persistence
   Future<bool> _read() async {
   
-    final instance = await SharedDb.getInstance();
+    final SharedDb instance = await SharedDb.getInstance();
 
     final String lenghtString = await instance.getString(this.lenghtKey);
     if(lenghtString == null) return false; // not wrote anything yet

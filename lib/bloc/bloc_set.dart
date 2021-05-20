@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter/material.dart';
 
@@ -6,16 +8,16 @@ import 'bloc.dart';
 import 'package:sid_utils/sid_utils.dart';
 
 class BlocSet<T> {
-  BlocSet(this.list) {
+  BlocSet(this.list): this.index = 0 {
     assert(list != null);
     assert(list.length != 0);
-    this.index = 0;
     this.variable = BlocVar<T>(this.list[this.index]);
   }
 
   List<T> list;
   int index;
   BlocVar<T> variable;
+  StreamSubscription _pickSubscription;
 
   Type get type => T;
 
@@ -45,6 +47,7 @@ class BlocSet<T> {
 
   void dispose() {
     this.variable.dispose();
+    this._pickSubscription?.cancel();
   }
 
 
@@ -64,10 +67,10 @@ class BlocSet<T> {
   }
 
   void correlate<A>(BlocVar<A> a, T map(A av)){
-    a.out.map(map).distinct().listen(this.chooseElement);
+    _pickSubscription = a.out.map<T>(map).distinct().listen(this.chooseElement);
   }
   void correlateIndex<A>(BlocVar<A> a, int map(A av)){
-    a.out.map(map).distinct().listen(this.choose);
+    _pickSubscription = a.out.map<int>(map).distinct().listen(this.choose);
   }
 
   void correlateLatest2<A,B>(
@@ -75,18 +78,17 @@ class BlocSet<T> {
     BlocVar<B> b,
     T map(
       A av, B bv,
-    )
+    ),
   ){
-    Observable.combineLatest2(
+    _pickSubscription = CombineLatestStream.combine2<A,B,T>(
       a.out, 
       b.out, 
       map
     )
     .distinct()
     .listen(this.chooseElement);
-    // a.refresh();
-    // b.refresh();
   }
+
   void correlateLatest3<A,B,C>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -95,8 +97,7 @@ class BlocSet<T> {
       A av, B bv, C cv
     )
   ){
-
-    Observable.combineLatest3(
+    _pickSubscription = CombineLatestStream.combine3<A,B,C,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -104,10 +105,8 @@ class BlocSet<T> {
     )
     .distinct()
     .listen(this.chooseElement);
-    // a.refresh();
-    // b.refresh();
-    // c.refresh();
   }
+
   void correlateLatest4<A,B,C,D>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -117,8 +116,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv
     )
   ){
-
-    Observable.combineLatest4(
+    _pickSubscription = CombineLatestStream.combine4<A,B,C,D,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -127,11 +125,8 @@ class BlocSet<T> {
     )
     .distinct()
     .listen(this.chooseElement);
-    // a.refresh();
-    // b.refresh();
-    // c.refresh();
-    // d.refresh();
   }
+
   void correlateLatest5<A,B,C,D,E>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -142,8 +137,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv, E ev
     )
   ){
-
-    Observable.combineLatest5(
+    _pickSubscription = CombineLatestStream.combine5<A,B,C,D,E,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -153,12 +147,8 @@ class BlocSet<T> {
     )
     .distinct()
     .listen(this.chooseElement);
-    // a.refresh();
-    // b.refresh();
-    // c.refresh();
-    // d.refresh();
-    // e.refresh();
   }
+
   void correlateLatest6<A,B,C,D,E,F>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -170,8 +160,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv, E ev, F fv
     )
   ){
-
-    Observable.combineLatest6(
+    _pickSubscription = CombineLatestStream.combine6<A,B,C,D,E,F,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -183,6 +172,7 @@ class BlocSet<T> {
     .distinct()
     .listen(this.chooseElement);
   }
+
   void correlateLatest7<A,B,C,D,E,F,G>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -195,7 +185,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv, E ev, F fv, G gv
     )
   ){
-    Observable.combineLatest7(
+    _pickSubscription = CombineLatestStream.combine7<A,B,C,D,E,F,G,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -210,6 +200,7 @@ class BlocSet<T> {
     .distinct()
     .listen(this.chooseElement);
   }
+
   void correlateLatest8<A,B,C,D,E,F,G,H>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -223,7 +214,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv, E ev, F fv, G gv, H hv,
     )
   ){
-    Observable.combineLatest8(
+    _pickSubscription = CombineLatestStream.combine8<A,B,C,D,E,F,G,H,T>(
       a.out, 
       b.out, 
       c.out, 
@@ -239,6 +230,7 @@ class BlocSet<T> {
     .distinct()
     .listen(this.chooseElement);
   }
+  
   void correlateLatest9<A,B,C,D,E,F,G,H,I>(
     BlocVar<A> a,
     BlocVar<B> b,
@@ -253,7 +245,7 @@ class BlocSet<T> {
       A av, B bv, C cv, D dv, E ev, F fv, G gv, H hv, I iv,
     )
   ){
-    Observable.combineLatest9(
+    _pickSubscription = CombineLatestStream.combine9<A,B,C,D,E,F,G,H,I,T>(
       a.out, 
       b.out, 
       c.out, 

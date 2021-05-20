@@ -16,9 +16,9 @@ class CachedVar<T>{
     this._read();
   }
 
-  set value(T value) {
+  set value(T newVal) {
     this._write();
-    this.privateValue = value;
+    this.privateValue = newVal;
   }
 
   T get value => this.privateValue;

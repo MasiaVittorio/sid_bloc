@@ -60,14 +60,14 @@ class PersistentVar<T> extends BlocVar<T>{
   @override
   void set(newVal, {bool withoutWriting = false}){
     super.set(newVal);
-    if(withoutWriting == false) 
+    if(!withoutWriting) 
       this._write();
   }
 
   @override
   bool setDistinct(newVal, {bool withoutWriting = false}){
     bool result = super.setDistinct(newVal);
-    if(withoutWriting == false) 
+    if(!withoutWriting) 
       this._write();
     return result;
   }
@@ -101,9 +101,9 @@ class PersistentVar<T> extends BlocVar<T>{
 
 
     if(jsonString == ''){
-    if(this.verboseRead == true) 
-      print("jsonString was empty or null");
-      return;
+      if(this.verboseRead == true) 
+        print("jsonString was empty or null");
+        return;
     }
     if(this.verboseRead == true) 
       print("read $T 1 string $jsonString");
@@ -126,7 +126,7 @@ class PersistentVar<T> extends BlocVar<T>{
     if(this.verboseRead == true) 
       print("read $T 3 result $result");
 
-    if(result is T || result == null) 
+    if(result is T) /// if T is a nullable type, then "null is T" is true :D
       this.set(result, withoutWriting: true);
     else 
       print('read error $T');

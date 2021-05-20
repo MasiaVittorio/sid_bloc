@@ -22,7 +22,7 @@ typedef ChildValueBuilder<T> = Widget Function(
 
 class BlocVar<T> {
 
-  static const bool _defDistinct = false;
+  static const bool _defaultDistinct = false;
 
   BlocVar(
     T val, 
@@ -32,13 +32,8 @@ class BlocVar<T> {
       this.copier,
     }
   ): 
-    value = copier != null
-      ? val != null ? copier(val) : null 
-      : val,
-    behavior = BehaviorSubject<T>.seeded(copier != null
-      ? val != null ? copier(val) : null 
-      : val,
-    );
+    value = copier?.call(val) ?? val,
+    behavior = BehaviorSubject<T>.seeded(copier?.call(val) ?? val);
 
   T value;
 
@@ -102,8 +97,8 @@ class BlocVar<T> {
   void notify() => this.onChanged?.call(this.value);
 
   void set(T newVal){
-    value = newVal == null ? null : this.copier?.call(newVal) ?? newVal;
-    behavior.add(this.copied);
+    this.value = newVal == null ? null : this.copier?.call(newVal) ?? newVal;
+    behavior.add(this.value);
     this.notify();
   }
 
@@ -164,7 +159,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(from.value), 
     onChanged: onChanged, equals: equals, copier: copier
@@ -180,7 +175,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value), 
     onChanged: onChanged, equals: equals, copier: copier
@@ -196,7 +191,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value), 
     onChanged: onChanged, equals: equals, copier: copier
@@ -213,7 +208,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, fromD.value), 
     onChanged: onChanged, equals: equals, copier: copier
@@ -230,7 +225,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, 
         fromD.value, fromE.value), 
@@ -249,7 +244,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, 
         fromD.value, fromE.value, fromF.value), 
@@ -269,7 +264,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, fromD.value, 
         fromE.value, fromF.value, fromG.value), 
@@ -289,7 +284,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, fromD.value, 
         fromE.value, fromF.value, fromG.value, fromH.value), 
@@ -309,7 +304,7 @@ class BlocVar<T> {
     bool Function(T,T) equals,
     void Function(T) onChanged,
     T Function(T) copier,
-    bool distinct = _defDistinct,
+    bool distinct = _defaultDistinct,
   }) => BlocVar<T>(
     map(fromA.value, fromB.value, fromC.value, fromD.value, fromE.value, 
         fromF.value, fromG.value, fromH.value, fromI.value), 
@@ -330,7 +325,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest2(
+    stream: CombineLatestStream.combine2(
       fromA.outModal(distinct), fromB.outModal(distinct), 
       (A av, B bv,) => {
         'a': av, 'b': bv,
@@ -351,7 +346,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest3(
+    stream: CombineLatestStream.combine3(
       fromA.outModal(distinct), fromB.outModal(distinct), 
       fromC.outModal(distinct), 
       (A av, B bv, C cv) => {
@@ -373,7 +368,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest4(
+    stream: CombineLatestStream.combine4(
       fromA.outModal(distinct), fromB.outModal(distinct), 
       fromC.outModal(distinct), fromD.outModal(distinct), 
       (A av, B bv, C cv, D dv) => <String,dynamic>{
@@ -396,7 +391,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D,E) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest5(
+    stream: CombineLatestStream.combine5(
       fromA.outModal(distinct), fromB.outModal(distinct), 
       fromC.outModal(distinct), fromD.outModal(distinct), 
       fromE.outModal(distinct), 
@@ -423,7 +418,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D,E,F) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest6(
+    stream: CombineLatestStream.combine6(
       fromA.outModal(distinct), fromB.outModal(distinct), 
       fromC.outModal(distinct), fromD.outModal(distinct), 
       fromE.outModal(distinct), fromF.outModal(distinct), 
@@ -450,7 +445,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D,E,F,G) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest7(
+    stream: CombineLatestStream.combine7(
       fromA.outModal(distinct), fromB.outModal(distinct), fromC.outModal(distinct), 
       fromD.outModal(distinct), fromE.outModal(distinct), fromF.outModal(distinct), 
       fromG.outModal(distinct), 
@@ -478,7 +473,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D,E,F,G,H) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest8(
+    stream: CombineLatestStream.combine8(
       fromA.outModal(distinct), fromB.outModal(distinct), fromC.outModal(distinct), 
       fromD.outModal(distinct), fromE.outModal(distinct), fromF.outModal(distinct), 
       fromG.outModal(distinct), fromH.outModal(distinct),
@@ -506,7 +501,7 @@ class BlocVar<T> {
     @required Widget Function(BuildContext,A,B,C,D,E,F,G,H,I) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
-    stream: Observable.combineLatest9(
+    stream: CombineLatestStream.combine9(
       fromA.outModal(distinct), fromB.outModal(distinct), fromC.outModal(distinct), 
       fromD.outModal(distinct), fromE.outModal(distinct), fromF.outModal(distinct), 
       fromG.outModal(distinct), fromH.outModal(distinct), fromI.outModal(distinct),
