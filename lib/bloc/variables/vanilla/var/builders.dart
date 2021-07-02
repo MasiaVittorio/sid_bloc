@@ -7,7 +7,7 @@ extension BlocVarBuilders<T> on BlocVar<T> {
   ) => build(builder, distinct: true);
 
   Widget build(
-    ValueBuilder<T?> builder,
+    ValueBuilder<T> builder,
     {bool distinct = false,}
   ) => StreamBuilder<T>(
     stream: distinct
@@ -15,12 +15,13 @@ extension BlocVarBuilders<T> on BlocVar<T> {
       : this.out,
     initialData: this.value,
     builder: (BuildContext context, AsyncSnapshot<T> snapshot)
-      => builder(context,snapshot.data),
+      => builder(context, snapshot.data as T),
+      // data can be null but it will only be null when value is really null
   );
 
   Widget buildChild({
     Widget? child,
-    required ChildValueBuilder builder,
+    required ChildValueBuilder<T> builder,
     bool distinct = false,
   }) => StreamBuilder<T>(
     stream: distinct 
@@ -28,7 +29,7 @@ extension BlocVarBuilders<T> on BlocVar<T> {
       : this.out,
     initialData: this.value,
     builder: (BuildContext context, AsyncSnapshot<T> snapshot)
-      => builder(context,snapshot.data, child),
+      => builder(context, snapshot.data as T, child),
   );
 
 

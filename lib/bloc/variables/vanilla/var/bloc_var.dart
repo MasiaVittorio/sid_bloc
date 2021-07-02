@@ -16,7 +16,7 @@ typedef ValueBuilder<T> = Widget Function(
 );
 typedef ChildValueBuilder<T> = Widget Function(
   BuildContext context, 
-  T? val, 
+  T val, 
   Widget? child,
 );
 
