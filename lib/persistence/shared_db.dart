@@ -145,7 +145,7 @@ class SharedDb {
         'UPDATE $_TABLE SET value = ? WHERE key = ?',
         [value,key]
       );
-      if(changes == 0)
+      if(changes == 0){
         await this.db!.execute(
           '''
           INSERT INTO $_TABLE (key, $_COLUMN_VALUE) 
@@ -153,6 +153,7 @@ class SharedDb {
           ''', 
           [key, value]
         );
+      }
 
       return true;
     } catch (e) {
