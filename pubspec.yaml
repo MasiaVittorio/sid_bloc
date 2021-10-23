@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   sid_utils:
-    path: ../sid_utils
+    git: https://github.com/MasiaVittorio/sid_utils.git
   path_provider: ^2.0.1
   rxdart: ^0.27.0
   sqflite: ^2.0.0+3
