@@ -60,7 +60,7 @@ class BlocSet<T> {
     distinct = false,
   }){
     return this.variable.build(
-      builder as Widget Function(BuildContext, T?),
+      builder,
       distinct: distinct,
     );
   }

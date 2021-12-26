@@ -1,15 +1,8 @@
 import 'package:sid_bloc/persistence/shared_db.dart';
 
 import 'bloc.dart';
-import 'variables/persistent/bloc_var_persistent.dart';
-
-import 'bloc_set.dart';
-
-// import 'dart:io';
 
 import 'dart:convert';
-
-// import 'package:path_provider/path_provider.dart';
 
 
 

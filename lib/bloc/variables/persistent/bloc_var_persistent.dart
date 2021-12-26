@@ -57,14 +57,14 @@ class PersistentVar<T> extends BlocVar<T>{
   // final bool hiveOverSqflite;
 
   @override
-  void set(newVal, {bool withoutWriting = false}){
+  void set(T newVal, {bool withoutWriting = false}){
     super.set(newVal);
     if(!withoutWriting) 
       this._write();
   }
 
   @override
-  bool setDistinct(newVal, {bool withoutWriting = false}){
+  bool setDistinct(T newVal, {bool withoutWriting = false}){
     bool result = super.setDistinct(newVal);
     if(!withoutWriting) 
       this._write();

@@ -53,7 +53,7 @@ class SidCache<T>{
         for(String s in jsonObject)
           this.fromJson(s),
 
-      ]..where((t) => t is T);
+      ];
   }
 
   void _write() async {
