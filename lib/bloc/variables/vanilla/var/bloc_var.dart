@@ -24,16 +24,12 @@ class BlocVar<T> {
 
   static const bool _defaultDistinct = false;
 
-  BlocVar(
-    T val, 
-    {
-      this.onChanged, 
-      this.equals,
-      this.copier,
-    }
-  ): 
-    value = copier?.call(val) ?? val,
-    behavior = BehaviorSubject<T>.seeded(copier?.call(val) ?? val);
+  BlocVar(T initVal, {
+    this.onChanged, 
+    this.equals,
+    this.copier,
+  }): value = copier?.call(initVal) ?? initVal,
+      behavior = BehaviorSubject<T>.seeded(copier?.call(initVal) ?? initVal);
 
   T value;
 
@@ -151,7 +147,7 @@ class BlocVar<T> {
   }
 
 
-  static BlocVar fromCorrelate<T,A>({
+  static BlocVar<T> fromCorrelate<T,A>({
     required BlocVar<A> from,
     required T Function(A) map, 
     bool Function(T,T)? equals,
@@ -320,7 +316,7 @@ class BlocVar<T> {
 
   static Widget build2<A,B>(
     BlocVar<A> fromA, BlocVar<B> fromB, {
-    required Widget Function(BuildContext,A?,B?) builder,
+    required Widget Function(BuildContext,A,B) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine2(
@@ -341,7 +337,7 @@ class BlocVar<T> {
 
   static Widget build3<A,B,C>(
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, {
-    required Widget Function(BuildContext,A?,B?,C?) builder,
+    required Widget Function(BuildContext,A,B,C) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine3(
@@ -363,7 +359,7 @@ class BlocVar<T> {
 
   static Widget build4<A,B,C,D>(
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, BlocVar<D> fromD, {
-    required Widget Function(BuildContext,A?,B?,C?,D?) builder,
+    required Widget Function(BuildContext,A,B,C,D) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine4(
@@ -386,7 +382,7 @@ class BlocVar<T> {
   static Widget build5<A,B,C,D,E>(
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, 
     BlocVar<D> fromD, BlocVar<E> fromE, {
-    required Widget Function(BuildContext,A?,B?,C?,D?,E?) builder,
+    required Widget Function(BuildContext,A,B,C,D,E) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine5(
@@ -413,7 +409,7 @@ class BlocVar<T> {
   static Widget build6<A,B,C,D,E,F>(
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, 
     BlocVar<D> fromD, BlocVar<E> fromE, BlocVar<F> fromF, {
-    required Widget Function(BuildContext,A?,B?,C?,D?,E?,F?) builder,
+    required Widget Function(BuildContext,A,B,C,D,E,F) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine6(
@@ -440,7 +436,7 @@ class BlocVar<T> {
   static Widget build7<A,B,C,D,E,F,G>(
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, BlocVar<D> fromD, 
     BlocVar<E> fromE, BlocVar<F> fromF, BlocVar<G> fromG, {
-    required Widget Function(BuildContext,A?,B?,C?,D?,E?,F?,G?) builder,
+    required Widget Function(BuildContext,A,B,C,D,E,F,G) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine7(
@@ -468,7 +464,7 @@ class BlocVar<T> {
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, 
     BlocVar<D> fromD, BlocVar<E> fromE, BlocVar<F> fromF,
     BlocVar<G> fromG, BlocVar<H> fromH, {
-    required Widget Function(BuildContext,A?,B?,C?,D?,E?,F?,G?,H?) builder,
+    required Widget Function(BuildContext,A,B,C,D,E,F,G,H) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine8(
@@ -496,7 +492,7 @@ class BlocVar<T> {
     BlocVar<A> fromA, BlocVar<B> fromB, BlocVar<C> fromC, 
     BlocVar<D> fromD, BlocVar<E> fromE, BlocVar<F> fromF,
     BlocVar<G> fromG, BlocVar<H> fromH, BlocVar<I> fromI, {
-    required Widget Function(BuildContext,A?,B?,C?,D?,E?,F?,G?,H?,I?) builder,
+    required Widget Function(BuildContext,A,B,C,D,E,F,G,H,I) builder,
     bool distinct = false,
   }) => StreamBuilder<Map<String,dynamic>>(
     stream: CombineLatestStream.combine9(

@@ -24,9 +24,7 @@ extension BlocVarBuilders<T> on BlocVar<T> {
     required ChildValueBuilder<T> builder,
     bool distinct = false,
   }) => StreamBuilder<T>(
-    stream: distinct 
-      ? this.outDistinct
-      : this.out,
+    stream: this.outModal(distinct),
     initialData: this.value,
     builder: (BuildContext context, AsyncSnapshot<T> snapshot)
       => builder(context, snapshot.data as T, child),
