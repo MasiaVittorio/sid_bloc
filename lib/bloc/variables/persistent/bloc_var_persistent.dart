@@ -78,6 +78,12 @@ class PersistentVar<T> extends BlocVar<T>{
   }
 
   @override
+  void refreshDistinct(){
+    super.refreshDistinct();
+    this._write();
+  }
+
+  @override
   void edit(void Function(T) editor){
     super.edit(editor);
     this._write();
